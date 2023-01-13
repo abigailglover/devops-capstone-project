@@ -202,3 +202,10 @@ class TestAccountService(TestCase):
         new_account = {"id": 0, "name":"John Smith"}
         resp = self.client.put(f"{BASE_URL}/{new_account['id']}", json=new_account)
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    # Test error handlers for code coverage
+
+    def test_method_not_allowed(self):
+        """It should not allow an illegal method call"""
+        resp = self.client.delete(BASE_URL)
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
