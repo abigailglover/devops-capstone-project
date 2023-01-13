@@ -164,6 +164,7 @@ class TestAccountService(TestCase):
 
 
     # Test Delete an Account...
+
     def test_delete_account(self):
         """It should Delete an Account"""
         account = self._create_accounts(1)[0]
@@ -175,3 +176,29 @@ class TestAccountService(TestCase):
         id = 0
         resp = self.client.delete(f"{BASE_URL}/{id}")
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+
+    # Test Update an Account...
+
+    def test_update_account(self):
+        """It should Update an existing Account"""
+
+        # create a test Account to update
+        test_account = AccountFactory()
+        resp = self.client.post(BASE_URL, json=test_account.serialize())
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # update the account
+        new_account = resp.get_json()
+        new_account["name"] = "John Smith"
+        resp = self.client.put(f"{BASE_URL}/{new_account['id']}", json=new_account)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        updated_account = resp.get_json()
+        self.assertEqual(updated_account["name"], "John Smith")
+
+    def test_update_account_not_found(self):
+        """It should not be able to do anything if an account is not found to update and return status 404"""
+
+        # create test data and try to update an account that doesn't exist
+        new_account = {"id": 0, "name":"John Smith"}
+        resp = self.client.put(f"{BASE_URL}/{new_account['id']}", json=new_account)
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
